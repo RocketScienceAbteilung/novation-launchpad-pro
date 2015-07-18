@@ -39,8 +39,9 @@ drumPage.onDown = function(isPressed)
    seqPage.onDown(isPressed);
 };
 
-drumPage.onGridButton = function(row, column, pressed)
+drumPage.onGridButton = function(row, column, velocity)
 {
+   var pressed = velocity > 0;
    if (!pressed) return;
 
    var cx = column >> 1;
@@ -48,8 +49,6 @@ drumPage.onGridButton = function(row, column, pressed)
 
    var fx = column & 1;
    var fy = row & 1;
-
-   var velocity = (fx + fy << 1) << 5;
 
    var key = gridToKey(cx, cy);
    cursorTrack.playNote(key, velocity);

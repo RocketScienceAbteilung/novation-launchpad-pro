@@ -124,7 +124,12 @@ function init()
 {
    host.getMidiInPort(0).setMidiCallback(onMidi);
 
-   noteInput = host.getMidiInPort(0).createNoteInput("Launchpad Pro Standalone Port", "80????", "90????");
+   noteInput = host.getMidiInPort(0).createNoteInput(
+      "Launchpad Pro Standalone Port",
+      "80????",
+      "90????",
+      "A0????"
+   );
    noteInput.setShouldConsumeEvents(false);
 
    transport = host.createTransport();
@@ -245,7 +250,7 @@ function resetDevice()
 {
    sendMidi(0xB0, 0, 0);
 
-   for(var i=0; i<98; i++)
+   for(var i=0; i<=98; i++)
    {
       pendingLEDs[i] = 0;
    }
@@ -276,7 +281,6 @@ function setDutyCycle(numerator, denominator)
 
 function updateNoteTranlationTable()
 {
-   //println("updateNoteTranlationTable");
    var table = initArray(-1, 128);
 
    for(var i=0; i<128; i++)
@@ -330,13 +334,10 @@ function onMidi(status, data1, data2)
             break;
 
          case TopButton.USER2:
-            if (!isPressed)
+            if (isPressed)
             {
-               setActivePage(seqPage);
+              setActivePage(seqPage);
             }
-
-            IS_EDIT_PRESSED = isPressed;
-
             break;
 
          case TopButton.MIXER:
@@ -381,7 +382,8 @@ function onMidi(status, data1, data2)
       var row = 8 - Math.floor(data1/10);
       var column = (data1 % 10) - 1;
 
-      activePage.onGridButton(row, column, data2 > 0);
+      // send full velocity value
+      activePage.onGridButton(row, column, data2);
    }
 }
 
@@ -443,14 +445,14 @@ function setCellLED(column, row, colour)
  * optimized approach or not, and to send only the LEDs that has changed.
  */
 
-var pendingLEDs = new Array(98);
-var activeLEDs = new Array(98);
+var pendingLEDs = new Array(99);
+var activeLEDs = new Array(99);
 
 function flushLEDs()
 {
    var changedCount = 0;
 
-   for(var i=0; i<98; i++)
+   for(var i=0; i<=98; i++)
    {
       if (pendingLEDs[i] != activeLEDs[i]) changedCount++;
    }
@@ -462,7 +464,7 @@ function flushLEDs()
   //  if (changedCount > 30)
   //  {
   //     // send using channel 3 optimized mode
-  //     for(var i = 0; i<98; i+=2)
+  //     for(var i = 0; i<=98; i+=2)
   //     {
   //        sendMidi(0x92, pendingLEDs[i], pendingLEDs[i+1]);
   //        activeLEDs[i] = pendingLEDs[i];
@@ -472,7 +474,7 @@ function flushLEDs()
   //  }
    else
    {
-      for(var i = 0; i<98; i++)
+      for(var i = 0; i<=98; i++)
       {
          if (pendingLEDs[i] != activeLEDs[i])
          {

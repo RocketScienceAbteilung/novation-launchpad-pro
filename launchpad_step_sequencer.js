@@ -60,7 +60,7 @@ seqPage.onShift = function(isPressed)
 seqPage.viewOffset = function()
 {
 	var x = Math.max(0,seqPage.playingStep) & 0xffffffe0;
-	
+
 	return Math.min(x, SEQ_BUFFER_STEPS - 32);
 }
 
@@ -70,7 +70,13 @@ seqPage.updateOutputState = function()
    this.canScrollUp = activeNoteMap.canScrollUp();
    this.canScrollDown = activeNoteMap.canScrollDown();
    this.updateScrollButtons();
-   setTopLED(6, Colour.YELLOW_FULL);
+    setTopLED(6,
+       TEMPMODE == TempMode.USER2
+          ? Colour.GREEN_FULL
+          : (TEMPMODE == TempMode.OFF
+          ? Colour.YELLOW_FULL
+          : Colour.OFF));
+
    setTopLED(7, this.detailMode ? Colour.RED_FULL : Colour.RED_LOW);
 
    this.drawSequencer();

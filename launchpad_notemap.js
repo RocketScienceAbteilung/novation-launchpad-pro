@@ -14,11 +14,6 @@ NoteMap.prototype.cellToKey = function(x, y)
    return -1;
 };
 
-NoteMap.prototype.cellToVelocity = function(x, y)
-{
-    return 90;
-};
-
 function isKeyBlack(key)
 {
     var k = key % 12;

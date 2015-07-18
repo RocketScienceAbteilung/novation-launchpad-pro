@@ -32,11 +32,6 @@ gridPage.updateOutputState = function()
          ? Colour.YELLOW_FULL
          : Colour.OFF));
 
-   /*setTopLED(7,
-      TEMPMODE == TempMode.TRACK
-         ? Colour.GREEN_FULL
-         : Colour.OFF);*/
-
    setTopLED(7, this.mixerAlignedGrid ? Colour.RED_FULL : Colour.RED_LOW);
 };
 
@@ -105,8 +100,9 @@ gridPage.onDown = function(isPressed)
    }
 };
 
-gridPage.onGridButton = function(row, column, pressed)
+gridPage.onGridButton = function(row, column, velocity)
 {
+   var pressed = velocity > 0;
    if (!pressed) return;
 
    if (TEMPMODE === TempMode.SCENE)

@@ -16,14 +16,17 @@ keysPage.updateOutputState = function()
    this.canScrollLeft = activeNoteMap.canScrollLeft();
    this.canScrollRight = activeNoteMap.canScrollRight();
    this.updateScrollButtons();
-   setTopLED(5, Colour.YELLOW_FULL);
-
+   setTopLED(5,
+      TEMPMODE == TempMode.USER1
+         ? Colour.GREEN_FULL
+         : (TEMPMODE == TempMode.OFF
+         ? Colour.YELLOW_FULL
+         : Colour.OFF));
    for(var i=0; i<4; i++)
    {
        var isCurrent = noteMaps[i] == activeNoteMap;
        var hasMap = noteMaps[i] != null;
        setRightLED(i, hasMap ? (isCurrent ? Colour.GREEN_FULL : Colour.GREEN_LOW) : Colour.OFF);
-       setRightLED(4 + i, seqPage.velocityStep == i ? Colour.AMBER_FULL : Colour.AMBER_LOW);
    }
 
    this.drawKeys();
@@ -37,11 +40,7 @@ keysPage.onSceneButton = function(row, isPressed)
 {
    if (!isPressed) return;
 
-   if (row >= 4)
-   {
-      seqPage.setVelocity(row - 4);
-   }
-   else if (noteMaps[row] != null)
+   if (noteMaps[row] != null)
    {
       activeNoteMap = noteMaps[row];
 
@@ -88,14 +87,13 @@ keysPage.scrollKey = function(offset)
    keysPage.rootKey = Math.max(0, Math.min(70, keysPage.rootKey + offset));
 };
 
-keysPage.onGridButton = function(row, column, pressed)
+keysPage.onGridButton = function(row, column, velocity)
 {
-   /*var key = activeNoteMap.cellToKey(column, row);
+   /*var pressed = velocity > 0;
+   var key = activeNoteMap.cellToKey(column, row);
 
    if (key >= 0)
    {
-      var velocity = 90;
-
       if (pressed)
       {
          cursorTrack.startNote(key, velocity);
