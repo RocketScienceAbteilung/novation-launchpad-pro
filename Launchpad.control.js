@@ -1,29 +1,22 @@
 
 loadAPI(1);
 
-host.defineController("Novation", "Launchpad", "1.0", "DC7C601D-C6D9-4627-875C-D0AA527BA73A");
+host.defineController("Novation", "Launchpad Pro", "1.0", "DC7C601D-C6D9-4627-875C-D0AA527BA73A");
 host.defineMidiPorts(1, 1);
-host.addDeviceNameBasedDiscoveryPair(["Launchpad"], ["Launchpad"]);
-host.addDeviceNameBasedDiscoveryPair(["Launchpad S"], ["Launchpad S"]);
-host.addDeviceNameBasedDiscoveryPair(["Launchpad Mini"], ["Launchpad Mini"]);
+host.addDeviceNameBasedDiscoveryPair(["Launchpad Pro Standalone Port"], ["Launchpad Launchpad Pro Standalone Port"]);
 
 for(var i=1; i<20; i++)
 {
    var name = i.toString() + "- Launchpad";
    host.addDeviceNameBasedDiscoveryPair([name], [name]);
-   host.addDeviceNameBasedDiscoveryPair(["Launchpad MIDI " + i.toString()], ["Launchpad MIDI " + i.toString()]);
-   host.addDeviceNameBasedDiscoveryPair(["Launchpad S " + i.toString()], ["Launchpad S " + i.toString()]);
-   host.addDeviceNameBasedDiscoveryPair(["Launchpad S MIDI " + i.toString()], ["Launchpad S MIDI " + i.toString()]);
-   host.addDeviceNameBasedDiscoveryPair(["Launchpad Mini " + i.toString()], ["Launchpad Mini " + i.toString()]);
-   host.addDeviceNameBasedDiscoveryPair(["Launchpad Mini MIDI " + i.toString()], ["Launchpad Mini MIDI " + i.toString()]);
+   host.addDeviceNameBasedDiscoveryPair(["Launchpad Pro Standalone Port " + i.toString()], ["Launchpad Pro Standalone Port " + i.toString()]);
 }
 
 if(host.platformIsLinux())
 {
 	for(var i=1; i<16; i++)
 	{
-	   host.addDeviceNameBasedDiscoveryPair(["Launchpad S " + + i.toString() + " MIDI 1"], ["Launchpad S " + + i.toString() + " MIDI 1"]);
-	   host.addDeviceNameBasedDiscoveryPair(["Launchpad Mini " + + i.toString() + " MIDI 1"], ["Launchpad Mini " + + i.toString() + " MIDI 1"]);
+	   host.addDeviceNameBasedDiscoveryPair(["Launchpad Pro Standalone Port " + + i.toString() + " MIDI 1"], ["Launchpad Pro Standalone Port " + + i.toString() + " MIDI 1"]);
 	}
 }
 
@@ -131,7 +124,7 @@ function init()
 {
    host.getMidiInPort(0).setMidiCallback(onMidi);
 
-   noteInput = host.getMidiInPort(0).createNoteInput("Launchpad", "80????", "90????");
+   noteInput = host.getMidiInPort(0).createNoteInput("Launchpad Pro Standalone Port", "80????", "90????");
    noteInput.setShouldConsumeEvents(false);
 
    transport = host.createTransport();
@@ -252,7 +245,7 @@ function resetDevice()
 {
    sendMidi(0xB0, 0, 0);
 
-   for(var i=0; i<80; i++)
+   for(var i=0; i<98; i++)
    {
       pendingLEDs[i] = 0;
    }
@@ -288,8 +281,8 @@ function updateNoteTranlationTable()
 
    for(var i=0; i<128; i++)
    {
-      var y = i >> 4;
-      var x = i & 0xF;
+     var y = 8 - Math.floor(i/10);
+     var x = (i % 10) - 1;
 
       if (x < 8 && activePage.shouldKeyBeUsedForNoteInport(x, y))
       {
@@ -310,14 +303,14 @@ function updateVelocityTranslationTable()
 
 function onMidi(status, data1, data2)
 {
-	 //printMidi(status, data1, data2);
+	 printMidi(status, data1, data2);
 
    if (MIDIChannel(status) != 0) return;
 
+   // recognising cc data
    if (isChannelController(status))
    {
       var isPressed = data2 > 0;
-
       switch(data1)
       {
          case TopButton.SESSION:
@@ -365,28 +358,36 @@ function onMidi(status, data1, data2)
          case TopButton.CURSOR_DOWN:
             activePage.onDown(isPressed);
             break;
+
+         case MixerButton.VOLUME:
+         case MixerButton.PAN:
+         case MixerButton.SEND_A:
+         case MixerButton.SEND_B:
+         case MixerButton.STOP:
+         case MixerButton.TRK_ON:
+         case MixerButton.SOLO:
+         case MixerButton.ARM:
+            if (isPressed)
+            {
+              var row = 8 - Math.floor(data1/10);
+              activePage.onSceneButton(row, data2 > 0);
+              break;
+            }
       }
    }
 
    if (isNoteOn(status) || isNoteOff(status, data2))
    {
-      var row = data1 >> 4;
-      var column = data1 & 0xF;
+      var row = 8 - Math.floor(data1/10);
+      var column = (data1 % 10) - 1;
 
-      if (column < 8)
-      {
-         activePage.onGridButton(row, column, data2 > 0);
-      }
-      else
-      {
-         activePage.onSceneButton(row, data2 > 0);
-      }
+      activePage.onGridButton(row, column, data2 > 0);
    }
 }
 
 function clear()
 {
-   for(var i=0; i<80; i++)
+   for(var i=0; i<96; i++)
    {
       pendingLEDs[i] = Colour.OFF;
    }
@@ -419,6 +420,7 @@ function drawBitwigLogo()
    setCellLED(2, 4, c);
    setCellLED(5, 4, c);
    setCellLED(6, 4, c);
+
 }
 
 function setTopLED(index, colour)
@@ -428,13 +430,12 @@ function setTopLED(index, colour)
 
 function setRightLED(index, colour)
 {
-   pendingLEDs[LED.SCENE + index] = colour;
+   pendingLEDs[9 + (7 - index + 1) * 10] = colour;
 }
 
 function setCellLED(column, row, colour)
 {
-   var key = row * 8 + column;
-
+   var key = column + ((7 - row + 1) * 10) + 1;
    pendingLEDs[key] = colour;
 }
 
@@ -442,14 +443,14 @@ function setCellLED(column, row, colour)
  * optimized approach or not, and to send only the LEDs that has changed.
  */
 
-var pendingLEDs = new Array(80);
-var activeLEDs = new Array(80);
+var pendingLEDs = new Array(98);
+var activeLEDs = new Array(98);
 
 function flushLEDs()
 {
    var changedCount = 0;
 
-   for(var i=0; i<80; i++)
+   for(var i=0; i<98; i++)
    {
       if (pendingLEDs[i] != activeLEDs[i]) changedCount++;
    }
@@ -458,40 +459,35 @@ function flushLEDs()
 
    //println("Repaint: " + changedCount + " LEDs");
 
-   if (changedCount > 30)
-   {
-      // send using channel 3 optimized mode
-      for(var i = 0; i<80; i+=2)
-      {
-         sendMidi(0x92, pendingLEDs[i], pendingLEDs[i+1]);
-         activeLEDs[i] = pendingLEDs[i];
-         activeLEDs[i+1] = pendingLEDs[i+1];
-      }
-      sendMidi(0xB0, 104 + 7, activeLEDs[79]); // send dummy message to leave optimized mode
-   }
+  //  if (changedCount > 30)
+  //  {
+  //     // send using channel 3 optimized mode
+  //     for(var i = 0; i<98; i+=2)
+  //     {
+  //        sendMidi(0x92, pendingLEDs[i], pendingLEDs[i+1]);
+  //        activeLEDs[i] = pendingLEDs[i];
+  //        activeLEDs[i+1] = pendingLEDs[i+1];
+  //     }
+  //     sendMidi(0xB0, 104 + 7, activeLEDs[79]); // send dummy message to leave optimized mode
+  //  }
    else
    {
-      for(var i = 0; i<80; i++)
+      for(var i = 0; i<98; i++)
       {
          if (pendingLEDs[i] != activeLEDs[i])
          {
+            var row = (i % 10) - 1
             activeLEDs[i] = pendingLEDs[i];
 
             var colour = activeLEDs[i];
 
-            if (i < 64) // Main Grid
+            if (i < 91) // Main Grid
             {
-               var column = i & 0x7;
-               var row = i >> 3;
-               sendMidi(0x90, row*16 + column, colour);
-            }
-            else if (i < 72)    // Right buttons
-            {
-               sendMidi(0x90, 8 + (i - 64) * 16, colour);
+               sendMidi(0x90, i, colour);
             }
             else    // Top buttons
             {
-               sendMidi(0xB0, 104 + (i - 72), colour);
+               sendMidi(0xB0, i, colour);
             }
          }
       }

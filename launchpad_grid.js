@@ -58,39 +58,9 @@ gridPage.onSceneButton = function(row, isPressed)
 {
    if (isPressed)
    {
-      switch(row)
+      if (0 <= row < 8)
       {
-         case MixerButton.VOLUME:
-            this.setTempMode(TempMode.VOLUME);
-            break;
-
-         case MixerButton.PAN:
-            this.setTempMode(TempMode.PAN);
-            break;
-
-         case MixerButton.SEND_A:
-            this.setTempMode(TempMode.SEND_A);
-            break;
-
-         case MixerButton.SEND_B:
-            this.setTempMode(TempMode.SEND_B);
-            break;
-
-         case MixerButton.STOP:
-            this.setTempMode(TempMode.USER1);
-            break;
-
-         case MixerButton.TRK_ON:
-            this.setTempMode(TempMode.USER2);
-            break;
-
-         case MixerButton.SOLO:
-            this.setTempMode(TempMode.USER3);
-            break;
-
-         case MixerButton.ARM:
-            this.setTempMode(TempMode.TRACK);
-            break;
+        this.setTempMode(row);
       }
    }
    else

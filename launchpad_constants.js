@@ -1,26 +1,26 @@
 
 var TopButton =
 {
-   CURSOR_UP:104,
-   CURSOR_DOWN:105,
-   CURSOR_LEFT:106,
-   CURSOR_RIGHT:107,
-   SESSION:108,
-   USER1:109,
-   USER2:110,
-   MIXER:111
+   CURSOR_UP:91,
+   CURSOR_DOWN:92,
+   CURSOR_LEFT:93,
+   CURSOR_RIGHT:94,
+   SESSION:95,
+   USER1:96,
+   USER2:97,
+   MIXER:98
 };
 
 var MixerButton =
 {
-   VOLUME:0,
-   PAN:1,
-   SEND_A:2,
-   SEND_B:3,
-   STOP:4,
-   TRK_ON:5,
-   SOLO:6,
-   ARM:7
+   VOLUME:89,
+   PAN:79,
+   SEND_A:69,
+   SEND_B:59,
+   STOP:49,
+   TRK_ON:39,
+   SOLO:29,
+   ARM:19
 };
 
 function mixColour(red, green, blink)
@@ -30,7 +30,7 @@ function mixColour(red, green, blink)
 
 var Colour = // Novation are from the UK
 {
-   OFF:12,
+   OFF:0,
    RED_LOW:13,
    RED_FULL:15,
    AMBER_LOW:29,
@@ -52,7 +52,7 @@ var LED =
 {
    GRID:0,
    SCENE:64,
-   TOP:72,
+   TOP:91,
 
    CURSOR_UP:0,
    CURSOR_DOWN:1,
