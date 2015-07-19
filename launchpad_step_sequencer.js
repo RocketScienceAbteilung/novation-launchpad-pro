@@ -108,7 +108,7 @@ seqPage.setVelocity = function(step)
    this.velocity = velocities[step];
 
    cursorTrack.playNote(this.key, this.velocity);
-   updateVelocityTranslationTable();
+   updateVelocityTranslationTable(this.velocity);
    host.showPopupNotification("Velocity: " + this.velocity);
 };
 

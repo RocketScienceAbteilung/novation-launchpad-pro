@@ -56,7 +56,7 @@ function setActivePage(page)
       }
 
       updateNoteTranlationTable();
-      updateVelocityTranslationTable();
+      updateVelocityTranslationTable(-1);
 
       // Update indications in the app
       for(var p=0; p<8; p++)
@@ -209,7 +209,7 @@ function init()
    setActivePage(gridPage);
 
    updateNoteTranlationTable();
-   updateVelocityTranslationTable();
+   updateVelocityTranslationTable(-1);
 
    animateLogo();
 }
@@ -288,7 +288,7 @@ function updateNoteTranlationTable()
      var y = 8 - Math.floor(i/10);
      var x = (i % 10) - 1;
 
-      if (x < 8 && activePage.shouldKeyBeUsedForNoteInport(x, y))
+      if (activePage.shouldKeyBeUsedForNoteInport(x, y))
       {
          table[i] = activeNoteMap.cellToKey(x, y);
       }
@@ -297,11 +297,14 @@ function updateNoteTranlationTable()
    noteInput.setKeyTranslationTable(table);
 }
 
-function updateVelocityTranslationTable()
+function updateVelocityTranslationTable(velocity)
 {
-   var table = initArray(seqPage.velocity, 128);
+   var table = initArray(velocity, 128);
    table[0] = 0;
-
+   if (velocity == -1) {
+     for (var i = 1; i < 128; i++)
+       table[i] = i;
+   }
    noteInput.setVelocityTranslationTable(table);
 }
 
