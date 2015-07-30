@@ -2,7 +2,7 @@
 loadAPI(1);
 
 host.defineController("Novation", "Launchpad Pro", "1.0", "DC7C601D-C6D9-4627-875C-D0AA527BA73A");
-host.defineMidiPorts(1, 1);
+host.defineMidiPorts(1,1);
 host.addDeviceNameBasedDiscoveryPair(["Launchpad Pro Standalone Port"], ["Launchpad Launchpad Pro Standalone Port"]);
 
 for(var i=1; i<20; i++)
@@ -14,10 +14,8 @@ for(var i=1; i<20; i++)
 
 if(host.platformIsLinux())
 {
-	for(var i=1; i<16; i++)
-	{
-	   host.addDeviceNameBasedDiscoveryPair(["Launchpad Pro Standalone Port " + + i.toString() + " MIDI 1"], ["Launchpad Pro Standalone Port " + + i.toString() + " MIDI 1"]);
-	}
+  var i = 2; // for some reason, the standalone port on linux is "Launchpad Pro MIDI 2", even though there are 3 ports.
+	   host.addDeviceNameBasedDiscoveryPair(["Launchpad Pro " + "MIDI " + i.toString() ], ["Launchpad Pro " + "MIDI " +  i.toString() ]);
 }
 
 var TempMode =
@@ -130,6 +128,7 @@ function init()
       "90????",
       "A0????"
    );
+
    noteInput.setShouldConsumeEvents(false);
 
    transport = host.createTransport();
@@ -312,10 +311,10 @@ function onMidi(status, data1, data2)
 {
 	 printMidi(status, data1, data2);
 
-   if (MIDIChannel(status) != 0) return;
+   //if (MIDIChannel(status) != 0) return;
 
    // recognising cc data
-   if (isChannelController(status))
+   if (isChannelController(status) || true)
    {
       var isPressed = data2 > 0;
       switch(data1)
