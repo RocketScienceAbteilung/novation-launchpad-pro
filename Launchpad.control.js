@@ -311,10 +311,10 @@ function onMidi(status, data1, data2)
 {
 	 printMidi(status, data1, data2);
 
-   //if (MIDIChannel(status) != 0) return;
+   if (MIDIChannel(status) != 0) return;
 
    // recognising cc data
-   if (isChannelController(status) || true)
+   if (isChannelController(status))
    {
       var isPressed = data2 > 0;
       switch(data1)
