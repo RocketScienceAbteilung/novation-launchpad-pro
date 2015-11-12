@@ -1,6 +1,7 @@
 # novation-launchpad-pro
 
 Support for Novation Launchpad Pro controller series in Bitwig Studio.
+This project will not be continued. Please refer to https://github.com/git-moss/LaunchpadPro4Bitwig which is far more advanced
 
 ## tips
 - Put the controller into "PROGRAM" mode by holding the "Setup" button,
